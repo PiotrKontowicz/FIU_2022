@@ -13,9 +13,3 @@ void write_to_logfile(char* path, long long timestamp, double value,
 void write_to_logfile_line(char* path, char* data, int size);
 
 unsigned long long get_unix_timestamp();
-
-void write_encrypted_data(unsigned char *data, const char *filepath, unsigned int size);
-
-static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream);
-
-bool upload_file_ftp(const char* file_path, const char* upload_url);

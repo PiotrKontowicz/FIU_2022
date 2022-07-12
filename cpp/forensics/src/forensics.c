@@ -8,13 +8,7 @@
 
 #include "log_files.h"
 #include "acc.h"
-#include "pedometer.h"
-#include "pressure.h"
 #include "hr.h"
-#include "location.h"
-#include "dev_wifi.h"
-
-#include <curl/curl.h>
 
 
 bool checkSupport(sensor_type_e type) {
@@ -24,14 +18,10 @@ bool checkSupport(sensor_type_e type) {
 }
 
 void init_cb_sensors() {
-	set_cb_pressure();
-	dlog_print(DLOG_DEBUG, "AAAAAA", "Set pressure.");
 	set_cb_hrm();
-	dlog_print(DLOG_DEBUG, "AAAAAA", "Set hrm.");
-	set_cb_steps();
-	dlog_print(DLOG_DEBUG, "AAAAAA", "Set steps.");
+	dlog_print(DLOG_DEBUG, "APP_FIU", "Set hrm.");
 	set_cb_acc();
-	dlog_print(DLOG_DEBUG, "AAAAAA", "Set acc.");
+	dlog_print(DLOG_DEBUG, "APP_FIU", "Set acc.");
 
 }
 
@@ -46,123 +36,42 @@ void app_request_response_cb(ppm_call_cause_e cause,
 		init_cb_sensors();
 		break;
 	case PRIVACY_PRIVILEGE_MANAGER_REQUEST_RESULT_DENY_FOREVER:
-		dlog_print(DLOG_ERROR, "AAAAAA", "DENY FOREVER");
+		dlog_print(DLOG_ERROR, "APP_FIU", "DENY FOREVER");
 		break;
 	case PRIVACY_PRIVILEGE_MANAGER_REQUEST_RESULT_DENY_ONCE:
-		dlog_print(DLOG_ERROR, "AAAAAA", "DENY ONCE");
-		break;
-	}
-}
-
-void set_location(){
-	init_location();
-	dlog_print(DLOG_DEBUG, "AAAAAA", "Set GPS.");
-	init_wifi();
-}
-
-void request_location(ppm_call_cause_e cause,
-		ppm_request_result_e result, const char *privilege, void *user_data) {
-	if (cause == PRIVACY_PRIVILEGE_MANAGER_CALL_CAUSE_ERROR) {
-		/* Log and handle errors */
-		return;
-	}
-	switch (result) {
-	case PRIVACY_PRIVILEGE_MANAGER_REQUEST_RESULT_ALLOW_FOREVER:
-		set_location();
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_REQUEST_RESULT_DENY_FOREVER:
-		dlog_print(DLOG_ERROR, "AAAAAA", "DENY FOREVER");
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_REQUEST_RESULT_DENY_ONCE:
-		dlog_print(DLOG_ERROR, "AAAAAA", "DENY ONCE");
+		dlog_print(DLOG_ERROR, "APP_FIU", "DENY ONCE");
 		break;
 	}
 }
 
 void sensor_init() {
-	if (checkSupport(SENSOR_PRESSURE) && checkSupport(SENSOR_HRM)
-			&& checkSupport(SENSOR_HUMAN_PEDOMETER)
-			&& checkSupport(SENSOR_ACCELEROMETER)) {
+	if ( checkSupport(SENSOR_HRM) && checkSupport(SENSOR_ACCELEROMETER)) {
 		ppm_check_result_e result;
 		ppm_check_permission("http://tizen.org/privilege/healthinfo", &result);
 		switch (result) {
-		case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW:
-			dlog_print(DLOG_ERROR, "AAAAAA",
-					"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW");
-			break;
-		case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY:
-			dlog_print(DLOG_ERROR, "AAAAAA",
-					"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY");
-			break;
-		case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ASK:
-			dlog_print(DLOG_INFO, "AAAAAA",
-					"Privacy manager request permission.");
-			ppm_request_permission("http://tizen.org/privilege/healthinfo",
-					app_request_response_cb, NULL);
-			break;
+			case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW:
+				dlog_print(DLOG_ERROR, "APP_FIU",
+						"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW");
+				break;
+			case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY:
+				dlog_print(DLOG_ERROR, "APP_FIU",
+						"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY");
+				break;
+			case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ASK:
+				dlog_print(DLOG_INFO, "APP_FIU",
+						"Privacy manager request permission.");
+				ppm_request_permission("http://tizen.org/privilege/healthinfo",
+						app_request_response_cb, NULL);
+				break;
 		}
 	} else {
-		dlog_print(DLOG_ERROR, "AAAAAA", "Pressure is not supported");
+		dlog_print(DLOG_ERROR, "APP_FIU", "Pressure is not supported");
 	}
 
-	ppm_check_result_e result;
-	ppm_check_permission("http://tizen.org/privilege/location", &result);
-	switch (result) {
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW:
-		dlog_print(DLOG_ERROR, "AAAAAA",
-				"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW");
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY:
-		dlog_print(DLOG_ERROR, "AAAAAA",
-				"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY");
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ASK:
-		dlog_print(DLOG_INFO, "AAAAAA",
-				"Privacy manager request permission.");
-		ppm_request_permission("http://tizen.org/privilege/location",
-				request_location, NULL);
-		break;
-	}
-
-
-
-	ppm_check_permission("http://tizen.org/privilege/network", &result);
-	switch (result) {
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW:
-		dlog_print(DLOG_ERROR, "AAAAAA",
-				"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ALLOW");
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY:
-		dlog_print(DLOG_ERROR, "AAAAAA",
-				"PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_DENY");
-		break;
-	case PRIVACY_PRIVILEGE_MANAGER_CHECK_RESULT_ASK:
-		dlog_print(DLOG_INFO, "AAAAAA",
-				"Privacy manager request permission.");
-		ppm_request_permission("http://tizen.org/privilege/network",
-				init_wifi, NULL);
-		break;
-	}
 }
 
 void _sensor_stop_cb(void *data, void *event_info) {
-	int error = sensor_listener_unset_event_cb(preassure_listener);
-	if (error != SENSOR_ERROR_NONE) {
-		dlog_print(DLOG_ERROR, LOG_TAG,
-				"sensor_listener_unset_event_cb error: %d", error);
-	}
-
-	error = sensor_listener_stop(preassure_listener);
-	if (error != SENSOR_ERROR_NONE) {
-		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_stop error: %d",
-				error);
-	}
-
-	error = sensor_destroy_listener(preassure_listener);
-	if (error != SENSOR_ERROR_NONE) {
-		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_destroy_listener error: %d",
-				error);
-	}
+	return;
 }
 
 bool service_app_create(void *data) {
