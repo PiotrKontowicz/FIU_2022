@@ -10,6 +10,7 @@
 #include "acc.h"
 #include "hr.h"
 
+// uninstall command: pkgcmd -u -n org.example.forensics
 
 bool checkSupport(sensor_type_e type) {
 	bool support;
