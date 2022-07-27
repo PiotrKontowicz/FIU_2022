@@ -25,7 +25,7 @@ void set_cb_hrm() {
 	ret = sensor_get_default_sensor(SENSOR_HRM, &hr_sensor);
 	ret = sensor_create_listener(hr_sensor, &hr_listener);
 	ret = sensor_listener_set_events_cb(hr_listener, hrm_callback, NULL);
-	ret = sensor_listener_set_interval(hr_listener, 500);
+	ret = sensor_listener_set_interval(hr_listener, 500); // Set interval
 	ret = sensor_listener_set_option(hr_listener, SENSOR_OPTION_ALWAYS_ON);
 	ret = sensor_listener_start(hr_listener);
 }

@@ -31,7 +31,7 @@ void set_cb_acc() {
 	ret = sensor_get_default_sensor(SENSOR_ACCELEROMETER, &acc_sensor);
 	ret = sensor_create_listener(acc_sensor, &acc_listener);
 	ret = sensor_listener_set_events_cb(acc_listener, acc_cb, NULL);
-	ret = sensor_listener_set_interval(acc_listener, 150);
+	ret = sensor_listener_set_interval(acc_listener, 150); // Set interval
 
 	ret = sensor_listener_set_option(acc_listener, SENSOR_OPTION_ALWAYS_ON);
 	ret = sensor_listener_start(acc_listener);
