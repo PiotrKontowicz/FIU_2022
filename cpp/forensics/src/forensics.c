@@ -11,6 +11,7 @@
 #include "hr.h"
 
 // uninstall command: pkgcmd -u -n org.example.forensics
+// Log files loction: /opt/usr/home/owner/data/*.log
 
 bool checkSupport(sensor_type_e type) {
 	bool support;
