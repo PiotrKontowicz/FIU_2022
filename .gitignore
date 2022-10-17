@@ -1,2 +1,5 @@
 
 *.tmp
+cpp/forensics/.sign/.manifest.tmp
+cpp/forensics/.sign/author-signature.xml
+cpp/forensics/.sign/signature1.xml
